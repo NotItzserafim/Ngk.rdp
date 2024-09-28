@@ -25,7 +25,20 @@ jobs:
           Write-Output "PASSWORD_AD: $env:PASSWORD_AD"
           Write-Output "NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}"
           Write-Output "Current User: $(whoami)"
-      
+      - name: Test Secrets
+        run: |
+          Write-Output "RDP_PASSWORD: ${{ secrets.RDP_PASSWORD }}"
+          Write-Output "PASSWORD_AD: ${{ secrets.PASSWORD_AD }}"
+      - name: Check Secrets
+        run: |
+          if (-not ${{ secrets.RDP_PASSWORD }}) {
+              Write-Output "Error: RDP_PASSWORD is empty!"
+              exit 1
+          }
+          if (-not ${{ secrets.PASSWORD_AD }}) {
+              Write-Output "Error: PASSWORD_AD is empty!"
+              exit 1
+          }
       - name: Enable Remote Desktop
         run: |
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
