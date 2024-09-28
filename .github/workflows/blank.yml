@@ -9,15 +9,23 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Preparing environment...
-      env:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        RDP_PASSWORD: ${{ secrets.RDP_PASSWORD }}
+      - uses: actions/checkout@v2
+      
+      - name: Preparing environment...
+        env:
+          NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
+          RDP_PASSWORD: ${{ secrets.RDP_PASSWORD }}
+        run: |
+          # Download ngrok and set up the authentication token
+          Invoke-WebRequest -Uri https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+          Expand-Archive -LiteralPath '.\ngrok.zip'
+          ./ngrok/ngrok.exe authtoken $env:NGROK_AUTH_TOKEN
 
-    - name: ngrok
-      run: ./ngrok.ps1 
-    - name: ngrok tunel
-      run: ./ngrok/ngrok tcp 3389
-    - name: Conf powershell
-      run: ./configure.ps1 
+      - name: Start ngrok tunnel
+        run: |
+          Start-Process -NoNewWindow -FilePath './ngrok/ngrok.exe' -ArgumentList 'tcp 3389'
+          # Wacht tot de tunnel actief is
+          Start-Sleep -Seconds 5
+
+      - name: Configure environment
+        run: ./configure.ps1 
