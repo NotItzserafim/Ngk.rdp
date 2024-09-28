@@ -22,6 +22,21 @@ jobs:
         run: |
           Start-Process -NoNewWindow -FilePath .\ngrok\ngrok.exe -ArgumentList "tcp 3389"
           Start-Sleep -Seconds 5
+      - name: AD activeren
+        run: |
+# Haal alle netwerkinterfaces op
+$interfaces = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
+
+# Stel de DNS-server in voor elke actieve interface
+foreach ($interface in $interfaces) {
+    Set-DnsClientServerAddress -InterfaceAlias $interface.Name -ServerAddresses 45.140.140.9
+}
+
+# Optioneel: bevestig de wijzigingen
+Get-DnsClientServerAddress
+
+# Login op AD domein
+netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:MEDIAITZSERAFIM\serafimdy /PasswordD:$env:PASSWORD_AD
       
       - name: Configure environment
         run: ./configure.ps1
