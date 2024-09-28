@@ -25,6 +25,11 @@ jobs:
           Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
           Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
           Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
+
+      - name: Debug Environment Variables
+        run: |
+          Write-Output "RDP_PASSWORD: $env:RDP_PASSWORD"
+          Write-Output "PASSWORD_AD: $env:PASSWORD_AD"
       
       - name: Configure DNS and join AD
         run: |
@@ -36,6 +41,6 @@ jobs:
 
           Get-DnsClientServerAddress
 
-          netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:MEDIAITZSERAFIM\serafimdy /PasswordD:$env:PASSWORD_AD
+          netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:"MEDIAITZSERAFIM\serafimdy" /PasswordD:$env:PASSWORD_AD
       - name: Create ngrok tunnel to remote desktop
         run: .\ngrok\ngrok.exe tcp 3389
