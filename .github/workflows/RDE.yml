@@ -30,6 +30,8 @@ jobs:
         run: |
           Write-Output "RDP_PASSWORD: $env:RDP_PASSWORD"
           Write-Output "PASSWORD_AD: $env:PASSWORD_AD"
+          Write-Output "NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}"
+          Write-Output "Current User: $(whoami)"
       
       - name: Configure DNS and join AD
         run: |
