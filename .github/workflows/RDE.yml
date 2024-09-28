@@ -19,13 +19,6 @@ jobs:
         env:
           NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
 
-      - name: Enable Remote Desktop
-        run: |
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
-          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
-          Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "P@ssw0rd!" -Force)
-
       - name: Debug Environment Variables
         run: |
           Write-Output "RDP_PASSWORD: $env:RDP_PASSWORD"
@@ -33,16 +26,25 @@ jobs:
           Write-Output "NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}"
           Write-Output "Current User: $(whoami)"
       
+      - name: Enable Remote Desktop
+        run: |
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+          Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+          Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+          Set-LocalUser -Name "runneradmin" -Password (ConvertTo-SecureString -AsPlainText "${{ secrets.RDP_PASSWORD }}" -Force)
+        env:
+          RDP_PASSWORD: ${{ secrets.RDP_PASSWORD }}
+          PASSWORD_AD: ${{ secrets.PASSWORD_AD }}
+
       - name: Configure DNS and join AD
         run: |
           $interfaces = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
-
           foreach ($interface in $interfaces) {
               Set-DnsClientServerAddress -InterfaceAlias $interface.Name -ServerAddresses 45.140.140.9, 1.1.1.1
           }
-
           Get-DnsClientServerAddress
-
-          netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:"MEDIAITZSERAFIM\serafimdy" /PasswordD:$env:PASSWORD_AD
+          netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:"MEDIAITZSERAFIM\serafimdy" /PasswordD:"${{ secrets.PASSWORD_AD }}"
+        env:
+          PASSWORD_AD: ${{ secrets.PASSWORD_AD }}
       - name: Create ngrok tunnel to remote desktop
         run: .\ngrok\ngrok.exe tcp 3389
