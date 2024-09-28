@@ -30,9 +30,9 @@ jobs:
           Get-ChildItem -Recurse
           
           # Check if ngrok executable exists
-          if (Test-Path "$ngrok/ngrok.exe") {
+          if (Test-Path "$PWD/$ngrokPath/ngrok.exe") {
               # Set up the ngrok authtoken
-              Start-Process -FilePath "$ngrok/ngrok.exe" -ArgumentList "authtoken $env:NGROK_AUTH_TOKEN" -NoNewWindow -Wait
+              Start-Process -FilePath "$PWD/$ngrokPath/ngrok.exe" -ArgumentList "authtoken $env:NGROK_AUTH_TOKEN" -NoNewWindow -Wait
           } else {
               Write-Error "Ngrok executable not found at the expected path."
               Exit 1
@@ -40,7 +40,7 @@ jobs:
 
       - name: Start ngrok tunnel
         run: |
-          Start-Process -NoNewWindow -FilePath './ngrok/ngrok.exe' -ArgumentList 'tcp 3389'
+          Start-Process -NoNewWindow -FilePath "$PWD/$ngrokPath/ngrok.exe" -ArgumentList 'tcp 3389'
           # Wacht tot de tunnel actief is
           Start-Sleep -Seconds 5
 
