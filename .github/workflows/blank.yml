@@ -18,7 +18,8 @@ jobs:
         run: |
           # Download ngrok and set up the authentication token
           Invoke-WebRequest -Uri https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
-          Expand-Archive -LiteralPath '.\ngrok.zip'
+          # Force overwriting existing files when extracting ngrok
+          Expand-Archive -LiteralPath '.\ngrok.zip' -DestinationPath '.' -Force
           ./ngrok/ngrok.exe authtoken $env:NGROK_AUTH_TOKEN
 
       - name: Start ngrok tunnel
