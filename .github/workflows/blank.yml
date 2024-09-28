@@ -19,10 +19,15 @@ jobs:
           # Download ngrok and set up the authentication token
           $ngrokZipPath = "ngrok.zip"
           $ngrokPath = "ngrok"
-          
+
+          # Download ngrok
           Invoke-WebRequest -Uri https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile $ngrokZipPath
+          
           # Force overwriting existing files when extracting ngrok
           Expand-Archive -LiteralPath $ngrokZipPath -DestinationPath '.' -Force
+          
+          # Check the contents of the current directory
+          Get-ChildItem -Recurse
           
           # Check if ngrok executable exists
           if (Test-Path "$ngrok/ngrok.exe") {
