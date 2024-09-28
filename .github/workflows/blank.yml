@@ -25,3 +25,4 @@ jobs:
       
       - name: Configure environment
         run: ./configure.ps1
+
