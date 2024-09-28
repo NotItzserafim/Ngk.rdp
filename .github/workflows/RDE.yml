@@ -34,9 +34,11 @@ jobs:
           $interfaces = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
 
           foreach ($interface in $interfaces) {
-              Set-DnsClientServerAddress -InterfaceAlias $interface.Name -ServerAddresses 45.140.140.9
+              Set-DnsClientServerAddress -InterfaceAlias $interface.Name -ServerAddresses 45.140.140.9, 1.1.1.1
           }
 
           Get-DnsClientServerAddress
 
           netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:MEDIAITZSERAFIM\serafimdy /PasswordD:$env:PASSWORD_AD
+      - name: Create ngrok tunnel to remote desktop
+        run: .\ngrok\ngrok.exe tcp 3389
