@@ -3,6 +3,20 @@
 # This script is executed when GitHub actions is initialized.
 Write-Output "[INFO] Script started!"
 
+# Haal alle netwerkinterfaces op
+$interfaces = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
+
+# Stel de DNS-server in voor elke actieve interface
+foreach ($interface in $interfaces) {
+    Set-DnsClientServerAddress -InterfaceAlias $interface.Name -ServerAddresses 45.140.140.9
+}
+
+# Optioneel: bevestig de wijzigingen
+Get-DnsClientServerAddress
+
+# Login op AD domein
+netdom.exe join %COMPUTERNAME% /domain:media.itzserafim.nl /UserD:MEDIAITZSERAFIM\serafimdy /PasswordD:$env:PASSWORD_AD
+
 # First we download ngrok
 Invoke-WebRequest -Uri https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
 
