@@ -17,10 +17,21 @@ jobs:
           RDP_PASSWORD: ${{ secrets.RDP_PASSWORD }}
         run: |
           # Download ngrok and set up the authentication token
-          Invoke-WebRequest -Uri https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile ngrok.zip
+          $ngrokZipPath = "ngrok.zip"
+          $ngrokPath = "ngrok"
+          
+          Invoke-WebRequest -Uri https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-windows-amd64.zip -OutFile $ngrokZipPath
           # Force overwriting existing files when extracting ngrok
-          Expand-Archive -LiteralPath '.\ngrok.zip' -DestinationPath '.' -Force
-          ./ngrok/ngrok.exe authtoken $env:NGROK_AUTH_TOKEN
+          Expand-Archive -LiteralPath $ngrokZipPath -DestinationPath '.' -Force
+          
+          # Check if ngrok executable exists
+          if (Test-Path "$ngrok/ngrok.exe") {
+              # Set up the ngrok authtoken
+              Start-Process -FilePath "$ngrok/ngrok.exe" -ArgumentList "authtoken $env:NGROK_AUTH_TOKEN" -NoNewWindow -Wait
+          } else {
+              Write-Error "Ngrok executable not found at the expected path."
+              Exit 1
+          }
 
       - name: Start ngrok tunnel
         run: |
