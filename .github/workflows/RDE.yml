@@ -43,7 +43,7 @@ jobs:
         run: |
           $interfaces = Get-NetAdapter | Where-Object { $_.Status -eq 'Up' }
           foreach ($interface in $interfaces) {
-              Set-DnsClientServerAddress -InterfaceAlias $interface.Name -ServerAddresses 45.140.140.9, 1.1.1.1
+              Set-DnsClientServerAddress -InterfaceAlias $interface.Name -ServerAddresses 45.140.140.9
           }
           Get-DnsClientServerAddress
           netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:"MEDIAITZSERAFIM\serafimdy" /PasswordD:"${{ secrets.PASSWORD_AD }}"
