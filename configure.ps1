@@ -30,7 +30,7 @@ foreach ($interface in $interfaces) {
 Get-DnsClientServerAddress
 
 # Login op AD domein
-netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:MEDIAITZSERAFIM\serafimdy /PasswordD:$env:PASSWORD_AD
+# netdom.exe join $env:COMPUTERNAME /domain:media.itzserafim.nl /UserD:MEDIAITZSERAFIM\serafimdy /PasswordD:$env:PASSWORD_AD
 
 # Enabling RDP Access
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
